@@ -1,0 +1,7 @@
+.idea
+.venv
+.htmlcov
+.coverage
+*.egg-info
+dist
+test.sh
