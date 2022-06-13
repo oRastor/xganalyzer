@@ -1,9 +1,8 @@
 import os
 import unittest
 import pandas
-from pandas import DataFrame, MultiIndex
 
-from xganalyzer.events_aggregator import GamesEventsAggregator, CalculateContext, CalculateType, CalculateLocation
+from src.xganalyzer.events_aggregator import GamesEventsAggregator, CalculateContext, CalculateType, CalculateLocation
 
 
 class TestGameStatisticsAggregator(unittest.TestCase):
@@ -304,7 +303,7 @@ class TestGameStatisticsAggregator(unittest.TestCase):
             'expected_goals': CalculateContext(calculate_type=CalculateType.EXPECTED_GOALS),
         }
 
-        result_df = self.aggregator.aggregate(metrics_definition)
+        result_df = self.aggregator.aggregate(metrics_definition, False)
 
         self.assertAlmostEqual(result_df['expected_goals'][85804][14861], 0.871, 3)
         self.assertAlmostEqual(result_df['expected_goals'][85895][6727], 1.779, 3)

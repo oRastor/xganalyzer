@@ -73,10 +73,8 @@ class GamesEventsAggregator:
     def get_away_team_id(self, game_id: int):
         return self.games_df['team_2_id'][game_id]
 
-    def aggregate(self, metrics_definition: dict, print_progress: bool = False):
+    def aggregate(self, metrics_definition: dict, print_progress: bool = True):
         unique_games = self.get_unique_games()
-
-        print(unique_games)
 
         result = []
         index = 0
@@ -270,6 +268,9 @@ class GamesEventsAggregator:
         return result, finish
 
     def append_last_evnet_for_duration(self, events_df, home_team_id, minute, real_duration):
+        if len(events_df) == 0:
+            return events_df
+
         last_index = len(events_df) - 1
         home_score = events_df['home_score'][last_index]
         away_score = events_df['away_score'][last_index]
