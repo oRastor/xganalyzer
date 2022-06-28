@@ -23,6 +23,23 @@ class TestGameStatisticsAggregator(unittest.TestCase):
         events_df = self.aggregator.get_events(85804)
         self.assertEqual(30, len(events_df))
 
+    def test_calculate_games_count(self):
+        events_df = self.aggregator.get_events(85804)
+        home_team_id = self.aggregator.get_home_team_id(85804)
+        away_team_id = self.aggregator.get_away_team_id(85804)
+
+        context = CalculateContext(calculate_type=CalculateType.GAMES_COUNT)
+        self.assertEqual(1, self.aggregator.calculate(events_df, 85804, home_team_id, context))
+        self.assertEqual(1, self.aggregator.calculate(events_df, 85804, away_team_id, context))
+
+        context = CalculateContext(calculate_type=CalculateType.GAMES_COUNT, calculate_location=CalculateLocation.HOME)
+        self.assertEqual(1, self.aggregator.calculate(events_df, 85804, home_team_id, context))
+        self.assertEqual(0, self.aggregator.calculate(events_df, 85804, away_team_id, context))
+
+        context = CalculateContext(calculate_type=CalculateType.GAMES_COUNT, calculate_location=CalculateLocation.AWAY)
+        self.assertEqual(0, self.aggregator.calculate(events_df, 85804, home_team_id, context))
+        self.assertEqual(1, self.aggregator.calculate(events_df, 85804, away_team_id, context))
+
     def test_calculate_duration(self):
         events_df = self.aggregator.get_events(85804)
         home_team_id = self.aggregator.get_home_team_id(85804)
@@ -157,19 +174,19 @@ class TestGameStatisticsAggregator(unittest.TestCase):
         away_team_id = self.aggregator.get_away_team_id(85804)
 
         context = CalculateContext(calculate_type=CalculateType.EXPECTED_GOALS,
-                                   calculate_location=CalculateLocation.TOTAL)
-        self.assertAlmostEqual(0.871, self.aggregator.calculate(events_df, 85804, home_team_id, context), 3)
-        self.assertAlmostEqual(2.407, self.aggregator.calculate(events_df, 85804, away_team_id, context), 3)
+                                   calculate_location=CalculateLocation.TOTAL, precision=3)
+        self.assertEqual(0.871, self.aggregator.calculate(events_df, 85804, home_team_id, context))
+        self.assertEqual(2.407, self.aggregator.calculate(events_df, 85804, away_team_id, context))
 
         context = CalculateContext(calculate_type=CalculateType.EXPECTED_GOALS,
-                                   calculate_location=CalculateLocation.TOTAL, own_shots=False)
-        self.assertAlmostEqual(2.407, self.aggregator.calculate(events_df, 85804, home_team_id, context), 3)
-        self.assertAlmostEqual(0.871, self.aggregator.calculate(events_df, 85804, away_team_id, context), 3)
+                                   calculate_location=CalculateLocation.TOTAL, own_shots=False, precision=3)
+        self.assertEqual(2.407, self.aggregator.calculate(events_df, 85804, home_team_id, context))
+        self.assertEqual(0.871, self.aggregator.calculate(events_df, 85804, away_team_id, context))
 
         context = CalculateContext(calculate_type=CalculateType.EXPECTED_GOALS,
-                                   calculate_location=CalculateLocation.TOTAL, max_value=0.3)
-        self.assertAlmostEqual(0.871, self.aggregator.calculate(events_df, 85804, home_team_id, context), 3)
-        self.assertAlmostEqual(1.731, self.aggregator.calculate(events_df, 85804, away_team_id, context), 3)
+                                   calculate_location=CalculateLocation.TOTAL, max_value=0.3, precision=3)
+        self.assertEqual(0.871, self.aggregator.calculate(events_df, 85804, home_team_id, context))
+        self.assertEqual(1.731, self.aggregator.calculate(events_df, 85804, away_team_id, context))
 
     def test_calculate_xg_with_red_cards(self):
         events_df = self.aggregator.get_events(85801)
@@ -177,14 +194,14 @@ class TestGameStatisticsAggregator(unittest.TestCase):
         away_team_id = self.aggregator.get_away_team_id(85801)
 
         context = CalculateContext(calculate_type=CalculateType.EXPECTED_GOALS,
-                                   calculate_location=CalculateLocation.TOTAL)
-        self.assertAlmostEqual(1.498, self.aggregator.calculate(events_df, 85801, home_team_id, context), 3)
-        self.assertAlmostEqual(0.621, self.aggregator.calculate(events_df, 85801, away_team_id, context), 3)
+                                   calculate_location=CalculateLocation.TOTAL, precision=3)
+        self.assertEqual(1.498, self.aggregator.calculate(events_df, 85801, home_team_id, context))
+        self.assertEqual(0.621, self.aggregator.calculate(events_df, 85801, away_team_id, context))
 
         context = CalculateContext(calculate_type=CalculateType.EXPECTED_GOALS,
-                                   calculate_location=CalculateLocation.TOTAL, finish_on_red_card=True)
-        self.assertAlmostEqual(1.051, self.aggregator.calculate(events_df, 85801, home_team_id, context), 3)
-        self.assertAlmostEqual(0.621, self.aggregator.calculate(events_df, 85801, away_team_id, context), 3)
+                                   calculate_location=CalculateLocation.TOTAL, finish_on_red_card=True, precision=3)
+        self.assertEqual(1.051, self.aggregator.calculate(events_df, 85801, home_team_id, context))
+        self.assertEqual(0.621, self.aggregator.calculate(events_df, 85801, away_team_id, context))
 
     def test_calculate_xg_with_own_goals(self):
         events_df = self.aggregator.get_events(85895)
@@ -192,9 +209,9 @@ class TestGameStatisticsAggregator(unittest.TestCase):
         away_team_id = self.aggregator.get_away_team_id(85895)
 
         context = CalculateContext(calculate_type=CalculateType.EXPECTED_GOALS,
-                                   calculate_location=CalculateLocation.TOTAL)
-        self.assertAlmostEqual(2.142, self.aggregator.calculate(events_df, 85895, home_team_id, context), 3)
-        self.assertAlmostEqual(1.779, self.aggregator.calculate(events_df, 85895, away_team_id, context), 3)
+                                   calculate_location=CalculateLocation.TOTAL, precision=3)
+        self.assertEqual(2.142, self.aggregator.calculate(events_df, 85895, home_team_id, context))
+        self.assertEqual(1.779, self.aggregator.calculate(events_df, 85895, away_team_id, context))
 
     def test_calculate_shots_count(self):
         events_df = self.aggregator.get_events(85804)
@@ -269,7 +286,6 @@ class TestGameStatisticsAggregator(unittest.TestCase):
 
         self.assertEqual(85804, home_aggregations['game_id'])
         self.assertEqual(home_team_id, home_aggregations['team_id'])
-        self.assertEqual('13.08.2016 14:30:00', home_aggregations['date'])
         self.assertEqual(97, home_aggregations['duration'])
         self.assertEqual(12, home_aggregations['shots_count'])
 
@@ -279,9 +295,9 @@ class TestGameStatisticsAggregator(unittest.TestCase):
             'duration_away': CalculateContext(calculate_type=CalculateType.DURATION,
                                               calculate_location=CalculateLocation.AWAY),
             'expected_goals_home': CalculateContext(calculate_type=CalculateType.EXPECTED_GOALS,
-                                                 calculate_location=CalculateLocation.HOME),
+                                                    calculate_location=CalculateLocation.HOME, precision=3),
             'expected_goals_away': CalculateContext(calculate_type=CalculateType.EXPECTED_GOALS,
-                                                 calculate_location=CalculateLocation.AWAY),
+                                                    calculate_location=CalculateLocation.AWAY, precision=3),
             'shots_count_home': CalculateContext(calculate_type=CalculateType.SHOTS_COUNT,
                                                  calculate_location=CalculateLocation.HOME),
             'shots_count_away': CalculateContext(calculate_type=CalculateType.SHOTS_COUNT,
@@ -290,23 +306,22 @@ class TestGameStatisticsAggregator(unittest.TestCase):
 
         self.assertEqual(85804, away_aggregations['game_id'])
         self.assertEqual(away_team_id, away_aggregations['team_id'])
-        self.assertEqual('13.08.2016 14:30:00', away_aggregations['date'])
         self.assertEqual(0, away_aggregations['duration_home'])
         self.assertEqual(97, away_aggregations['duration_away'])
-        self.assertAlmostEqual(0, away_aggregations['expected_goals_home'], 3)
-        self.assertAlmostEqual(2.407, away_aggregations['expected_goals_away'], 3)
+        self.assertEqual(0, away_aggregations['expected_goals_home'])
+        self.assertEqual(2.407, away_aggregations['expected_goals_away'])
         self.assertEqual(0, away_aggregations['shots_count_home'])
         self.assertEqual(18, away_aggregations['shots_count_away'])
 
     def test_processor(self):
         metrics_definition = {
-            'expected_goals': CalculateContext(calculate_type=CalculateType.EXPECTED_GOALS),
+            'expected_goals': CalculateContext(calculate_type=CalculateType.EXPECTED_GOALS, precision=3),
         }
 
         result_df = self.aggregator.aggregate(metrics_definition, False)
 
-        self.assertAlmostEqual(result_df['expected_goals'][85804][14861], 0.871, 3)
-        self.assertAlmostEqual(result_df['expected_goals'][85895][6727], 1.779, 3)
+        self.assertEqual(result_df['expected_goals'][85804][14861], 0.871)
+        self.assertEqual(result_df['expected_goals'][85895][6727], 1.779)
 
 
 if __name__ == '__main__':

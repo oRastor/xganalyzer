@@ -9,6 +9,7 @@ class CalculateType(Enum):
     EXPECTED_GOALS = 2
     SHOTS_COUNT = 3
     GOALS = 4
+    GAMES_COUNT = 5
 
 
 class CalculateLocation(Enum):
@@ -32,7 +33,8 @@ class CalculateContext:
             difference_to: int = None,
             minute_from: int = None,
             minute_to: int = None,
-            max_value: float = 1
+            max_value: float = 1,
+            precision: int = None
     ):
         self.calculate_type = calculate_type
         self.calculate_location = calculate_location
@@ -47,6 +49,7 @@ class CalculateContext:
         self.minute_from = minute_from
         self.minute_to = minute_to
         self.max_value = max_value
+        self.precision = precision
 
 
 class GamesEventsAggregator:
@@ -68,10 +71,10 @@ class GamesEventsAggregator:
         return self.events_df.loc[self.events_df['game_id'] == game_id].copy()
 
     def get_home_team_id(self, game_id: int):
-        return self.games_df['team_1_id'][game_id]
+        return self.games_df['home_team_id'][game_id]
 
     def get_away_team_id(self, game_id: int):
-        return self.games_df['team_2_id'][game_id]
+        return self.games_df['away_team_id'][game_id]
 
     def aggregate(self, metrics_definition: dict, print_progress: bool = True):
         unique_games = self.get_unique_games()
@@ -106,7 +109,6 @@ class GamesEventsAggregator:
         data = {
             'game_id': game_id,
             'team_id': team_id,
-            'date': self.games_df['date_match'][game_id]
         }
 
         for key, value in metrics_definition.items():
@@ -118,11 +120,14 @@ class GamesEventsAggregator:
         if not self.check_location(calculate_context, game_id, team_id):
             return 0
 
-        home_team_id = self.games_df['team_1_id'][game_id]
+        home_team_id = self.games_df['home_team_id'][game_id]
         home = home_team_id == team_id
 
         if calculate_context.calculate_type == CalculateType.DURATION:
             return self.calculate_duration(calculate_context, events_df, game_id, home_team_id, home)
+
+        if calculate_context.calculate_type == CalculateType.GAMES_COUNT:
+            return 1
 
         return self.calculate_shots(calculate_context, events_df, home, team_id)
 
@@ -146,8 +151,8 @@ class GamesEventsAggregator:
                            home_team_id: int, home: bool):
         result = 0
 
-        first_half_duration = self.games_df['time_first'][game_id]
-        second_half_duration = self.games_df['time_match'][game_id] - self.HALF_DURATION
+        first_half_duration = self.games_df['duration_first_half'][game_id]
+        second_half_duration = self.games_df['duration_second_half'][game_id]
 
         first_half_events_df = events_df.loc[events_df['minute'] <= self.HALF_DURATION].copy().reset_index()
         second_half_events_df = events_df.loc[events_df['minute'] > self.HALF_DURATION].copy().reset_index()
@@ -209,7 +214,7 @@ class GamesEventsAggregator:
                     if self.is_red_card_event(events_df['type'][index]):
                         continue
 
-                    result += min(events_df['expected_goal'][index], calculate_context.max_value)
+                    result += min(events_df['xg'][index], calculate_context.max_value)
                 elif calculate_context.calculate_type == CalculateType.GOALS:
                     if not self.is_goal_event(events_df['type'][index]):
                         continue
@@ -222,7 +227,7 @@ class GamesEventsAggregator:
 
                     result += 1
 
-        return result
+        return self.round(result, calculate_context.precision)
 
     def calculate_partial_duration(self, calculate_context: CalculateContext, events_df: DataFrame, home: bool,
                                    start: int, finish: bool = False):
@@ -298,10 +303,10 @@ class GamesEventsAggregator:
 
     def check_location(self, calculate_context: CalculateContext, game_id: int, team_id: int) -> bool:
         if calculate_context.calculate_location == CalculateLocation.HOME:
-            return self.games_df['team_1_id'][game_id] == team_id
+            return self.games_df['home_team_id'][game_id] == team_id
 
         if calculate_context.calculate_location == CalculateLocation.AWAY:
-            return self.games_df['team_2_id'][game_id] == team_id
+            return self.games_df['away_team_id'][game_id] == team_id
 
         return True
 
@@ -330,3 +335,10 @@ class GamesEventsAggregator:
                 return False
 
         return True
+
+    @staticmethod
+    def round(value, precision=None):
+        if not precision:
+            return value
+
+        return round(value, precision)
