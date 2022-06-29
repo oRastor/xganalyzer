@@ -5,7 +5,7 @@ with open('README.md') as f:
 
 setup(
     name="xganalyzer",
-    version="0.1.3",
+    version="0.1.4",
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     url="https://github.com/oRastor/xganalyzer",
@@ -15,7 +15,7 @@ setup(
     description="Package for xG statistics aggregation",
     long_description=long_description,
     long_description_content_type='text/markdown',
-    install_requires=["pandas", "os", "numpy"],
+    install_requires=["pandas", "numpy"],
     extras_require={"dev": ["pytest", "requests_mock", "coverage", "mypy"]},
     keywords="football soccer xg expected-goals aggregation",
 )

@@ -1,7 +1,6 @@
 import os
 import unittest
 import pandas
-
 from src.xganalyzer.events_aggregator import GamesEventsAggregator, CalculateContext, CalculateType, CalculateLocation
 
 

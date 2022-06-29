@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-
 from pandas import DataFrame, Series
 import time
 

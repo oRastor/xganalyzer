@@ -1,7 +1,6 @@
 import os
 import unittest
 import pandas
-
 from src.xganalyzer.season_aggregator import SeasonAggregator, BasicSumMetric, ExpectedGaolsPer90IndexMinutesMetric, \
     AverageMetric, ExpectedGaolsPer90MinutesAverageMetric, ExpectedGaolsPerShotMetric, ExpectedGaolsPer90MinutesMetric
 
