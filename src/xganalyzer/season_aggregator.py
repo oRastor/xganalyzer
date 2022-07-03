@@ -158,7 +158,7 @@ class SeasonAggregator:
                 round_start_time = games_df['start_time'][game_id]
                 round_accumulator_df = self.create_accumulator()
 
-            if games_df.loc[game_id]['start_time'] > max_time:
+            if games_df.loc[game_id]['start_time'] > self.feature_interval:
                 break
 
             home_team_id = games_df.loc[game_id]['home_team_id']
