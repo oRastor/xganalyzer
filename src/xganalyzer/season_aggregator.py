@@ -93,6 +93,10 @@ class ExpectedGaolsPer90IndexMinutesMetric(ExpectedGaolsPer90MinutesMetric):
 
         for team_id in result_df.index:
             item = super().calculate(result_df, team_id)
+
+            if item is None:
+                continue
+
             value += item
 
             if item > 0:
@@ -108,6 +112,10 @@ class ExpectedGaolsPer90MinutesAverageMetric(ExpectedGaolsPer90MinutesMetric):
 
         for team_id in result_df.index:
             item = super().calculate(result_df, team_id)
+
+            if item is None:
+                continue
+
             value += item
 
             if item > 0:
