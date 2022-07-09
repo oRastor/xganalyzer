@@ -40,7 +40,7 @@ class ExpectedGaolsPer90MinutesMetric(AbstractMetric):
                 return self.round(90 * result_df.loc[team_id][self.expected_goals_metric] / result_df.loc[team_id][
                     self.duration_metric], self.precision)
 
-        return None
+        return 0
 
 
 class ExpectedGaolsPerShotMetric(AbstractMetric):
@@ -56,7 +56,7 @@ class ExpectedGaolsPerShotMetric(AbstractMetric):
                     result_df.loc[team_id][self.expected_goals_metric] / result_df.loc[team_id][self.count_metric],
                     self.precision)
 
-        return None
+        return 0
 
 
 class AverageMetric(AbstractMetric):
@@ -83,9 +83,12 @@ class ExpectedGaolsPer90IndexMinutesMetric(ExpectedGaolsPer90MinutesMetric):
             if result_df.loc[team_id][self.expected_goals_metric] > 0:
                 mean = self.mean(result_df)
 
-                return self.round(super().calculate(result_df, team_id) / mean, self.precision)
+                if mean > 0:
+                    return self.round(super().calculate(result_df, team_id) / mean, self.precision)
 
-        return None
+                return 0
+
+        return 0
 
     def mean(self, result_df: DataFrame):
         value = 0
@@ -94,7 +97,7 @@ class ExpectedGaolsPer90IndexMinutesMetric(ExpectedGaolsPer90MinutesMetric):
         for team_id in result_df.index:
             item = super().calculate(result_df, team_id)
 
-            if item is None:
+            if item == 0:
                 continue
 
             value += item
@@ -102,7 +105,10 @@ class ExpectedGaolsPer90IndexMinutesMetric(ExpectedGaolsPer90MinutesMetric):
             if item > 0:
                 count += 1
 
-        return value / count
+        if count > 0:
+            return value / count
+
+        return 0
 
 
 class ExpectedGaolsPer90MinutesAverageMetric(ExpectedGaolsPer90MinutesMetric):
@@ -113,7 +119,7 @@ class ExpectedGaolsPer90MinutesAverageMetric(ExpectedGaolsPer90MinutesMetric):
         for team_id in result_df.index:
             item = super().calculate(result_df, team_id)
 
-            if item is None:
+            if item == 0:
                 continue
 
             value += item
@@ -121,7 +127,10 @@ class ExpectedGaolsPer90MinutesAverageMetric(ExpectedGaolsPer90MinutesMetric):
             if item > 0:
                 count += 1
 
-        return self.round(value / count, self.precision)
+        if count > 0:
+            return self.round(value / count, self.precision)
+
+        return 0
 
 
 class SeasonAggregator:
