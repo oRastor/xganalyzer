@@ -5,7 +5,7 @@ with open('README.md') as f:
 
 setup(
     name="xganalyzer",
-    version="0.1.10",
+    version="0.1.11",
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     url="https://github.com/oRastor/xganalyzer",

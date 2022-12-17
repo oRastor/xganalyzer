@@ -87,12 +87,15 @@ class GamesEventsAggregator:
                 print(index, '/', len(unique_games))
 
             game_events_df = self.get_events(game_id)
+            home_team_id = self.get_home_team_id(game_id)
+            away_team_id = self.get_away_team_id(game_id)
 
-            result.append(self.aggregate_team_statistics(game_events_df, game_id, self.get_home_team_id(game_id),
-                                                         metrics_definition))
+            if home_team_id == away_team_id:
+                print("Home team and away team equals for fixture", game_id)
+                continue
 
-            result.append(self.aggregate_team_statistics(game_events_df, game_id, self.get_away_team_id(game_id),
-                                                         metrics_definition))
+            result.append(self.aggregate_team_statistics(game_events_df, game_id, home_team_id, metrics_definition))
+            result.append(self.aggregate_team_statistics(game_events_df, game_id, away_team_id, metrics_definition))
 
         result_df = DataFrame(result)
         result_df.set_index(['game_id', 'team_id'], inplace=True)
